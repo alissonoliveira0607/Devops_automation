@@ -1,0 +1,9 @@
+---
+
+- name: Chama role para instalação do apache
+  hosts: automation
+  become: yes
+  roles:
+  - geerlingguy.apache
+
+...
