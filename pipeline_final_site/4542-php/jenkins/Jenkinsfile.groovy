@@ -14,6 +14,7 @@ node {
         "--name ${JOB_BASE_NAME}",
         "--network ${JOB_BASE_NAME}",
         '--ip 192.168.10.10',
+        '--add-host=memcached:172.27.11.30',
         '-e DB_HOST=172.27.11.30',
         '-e DB_PROT=3306',
         '-e DB_NAME=infraagil',
