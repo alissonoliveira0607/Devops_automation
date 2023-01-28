@@ -1,0 +1,51 @@
+---
+- hosts: balancer
+  become: yes
+  tasks:
+  - name: Garantindo o HAProxy
+    package:
+      name: haproxy
+      state: present
+  - name: Garantindo a configuração
+    copy:
+      src: haproxy.cfg
+      dest: /etc/haproxy/
+  - name: Garantindo o serviço HAProxy
+    service:
+      name: haproxy
+      state: restarted
+      enabled: yes
+
+# - name: Instala dependência para o HAproxy
+#   hosts: balancer
+#   become: yes
+#   vars:
+#     pacote: haproxy
+#     estado: present
+#     servico: started
+#   tasks:
+#     - name: Garantindo a instalação do HAproxy
+#       package:
+#         name: '{{ pacote }}'
+#         state: '{{ estado }}'
+#     - name: Garantindo configurações do haproxy
+#       copy:
+#         src: /root/playbooks/files/haproxy.cfg
+#         dest: /etc/haproxy
+#       register: config
+#     - debug:
+#         msg: '{{ config }}'
+#     - name: Reinicia o serviço '{{ pacote }}'
+#       service:
+#         name: '{{ pacote }}'
+#         state: reloaded
+#       when: config.changed
+#     - name: Starta e habilita o serviço '{{ pacote }}'
+#       service:
+#         name: '{{ pacote }}'
+#         state: '{{ servico }}'
+#         enabled: yes        
+
+      
+
+...

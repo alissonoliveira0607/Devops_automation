@@ -1,0 +1,20 @@
+---
+- name: Instala o mariadb
+  become: yes
+  hosts: database
+  vars:
+    pacote: mariadb
+    estado: present
+    servico: started
+  tasks:
+    - name: mariadb install
+      package:
+        name: '{{ pacote }}'
+        state: '{{ estado }}'
+    - name: Starta e habilita o serviço '{{ pacote }}'
+      service:
+        name: '{{ pacote }}'
+        state: '{{ servico }}'
+        enabled: yes
+
+...

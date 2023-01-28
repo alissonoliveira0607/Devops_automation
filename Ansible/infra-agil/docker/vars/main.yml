@@ -1,0 +1,9 @@
+---
+# vars file for docker
+
+packages_remove: 
+- docker
+- docker-engine
+- docker.io
+- containerd
+- runc

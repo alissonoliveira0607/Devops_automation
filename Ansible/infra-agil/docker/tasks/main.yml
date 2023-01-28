@@ -1,0 +1,23 @@
+---
+# tasks file for docker
+
+- name: Removendo pacotes antigos
+  package:
+    name: '{{ packages_remove }}'
+    state: absent
+- name: Tarefas especificas
+  include_tasks: '{{ ansible_distribution|lower }}.yml'
+- name: Garantindo pacote docker-ce
+  package:
+    name: docker-ce
+    state: present
+- name: Garantindo execução do daemon
+  service:
+    name: docker
+    enabled: yes
+    state: started
+- name: Garantindo binário docker-compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+    dest: /usr/bin/docker-compose
+    mode: '0755'

@@ -1,0 +1,115 @@
+---
+
+- name: Instala o lighttpd
+  become: yes
+  hosts: docker
+  vars:
+    pacote: lighttpd
+    estado: present
+    servico: started
+    user: lighttpd
+    group: lighttpd
+  tasks:
+    - name: Verificando distros
+      set_fact:
+        user: www-data
+        group: www-data
+      when: ansible_distribution|lower == 'debian'
+    - name: Garantindo o epel-release para maquinas CentOS
+      package:
+        name: epel-release
+        state: present
+      when: ansible_distribution | lower == 'centos' 
+    - name: Garantindo o lighttpd
+      package:
+        name: '{{ pacote }}'
+        state: '{{ estado }}'       
+    - name: Garantindo configurações do lighttpd
+      template:
+        src: '{{ item }}'
+        dest: /etc/lighttpd
+        owner: root
+        group: root
+      #DEFININDO UM LOOP QUE SUBSTITUIRA O src POR CADA ITEM DA LISTA ABAIXO  
+      loop: 
+      - /root/playbooks/files/lighttpd.conf
+      - /root/playbooks/files/mime-types.conf
+      register: config
+    - name: Garantindo configurações de proxy
+      blockinfile:
+        path: /etc/lighttpd/proxy.conf
+        create: yes
+        block: |
+          $SERVER["socket"] == ":8080" {
+            proxy.server = ( "" => ( ( "host" => "192.168.10.10", "port" => "80" )))
+          }
+        insertafter: '# Configurações do Ansible'
+      register: proxy
+    - name: Garantido diretórios do lighttpd
+      file:
+        path: '{{ item }}' 
+        owner: '{{ user }}' 
+        group: '{{ group }}' 
+        state: directory
+      loop: 
+      - /srv/www/html
+      - /var/cache/lighttpd
+      - /var/logs/lighttpd
+    - name: Reiniciando lighttpd para aplicar as configs
+      service:
+        name: lighttpd
+        state: restarted
+      when: config.changed or proxy.changed
+    - name: Starta habilita o serviço '{{ pacote }}'
+      service:
+        name: '{{ pacote }}'
+        state: '{{ servico }}'
+        enabled: yes
+    - name: Removendo arquivos de /srv/www/html
+      #shell: 'rm -rf /srv/www/html/* && rm -rf /srv/www/html/.*'
+      shell: 'find /srv/www/html/ -delete -mindepth 1'    #BUSCANDO PELO DIRETÓRIO E DELETANDO
+    - name: Provisionando o site de exemplo
+      git:
+        repo: https://github.com/4linux/4542-site.git
+        dest: /srv/www/html
+        force: yes
+    # - name: Baixando raw do index.html
+    #   get_url:
+    #     url: https://raw.githubusercontent.com/alissonoliveira0607/site/ansible/index.html
+    #     dest: /srv/www/html/index.html
+    #     force: yes
+    # - name: Copiando o site para as maquinas
+    #   unarchive:
+    #     src: /root/arquivo.tar.gz
+    #     dest: /srv/www/html
+    #     extra_opts: '--strip-components=1'    #O STRIP FAZ COM QUE ELE PULE O PRIMEIRO DIRETÓRIO E NÃO CRIE O FOLDER site
+    #     owner: '{{ user }}'
+    #     group: '{{ group }}'
+    - name: Garantindo contexto de /srv/www/html selinux
+      shell: 'restorecon -R /srv/www/html/'
+      when: ansible_distribution|lower == 'centos'        
+    - name: Testando conexão com o LB
+      uri:
+        url: http://172.27.11.20
+        status_code: [200, 201, 302, 304]
+      register: response
+      delegate_to: localhost
+      run_once: yes
+
+
+
+
+
+    # - name: Garantindo configurações do lighttpd
+    #   copy:
+    #     src: /root/playbooks/files/lighttpd.conf
+    #     dest: /etc/lighttpd
+    #     owner: root
+    #     group: root
+    # - name: Garantindo configurações do mime-types
+    #   copy:
+    #     src: /root/playbooks/files/mime-types.conf
+    #     dest: /etc/lighttpd
+    #     owner: root
+    #     group: root        
+...

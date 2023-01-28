@@ -1,0 +1,22 @@
+---
+
+- name: Instala alguns pacotes
+  hosts: all
+  become: yes
+  gather_facts: no
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: Testando ICMP
+      ping:
+    - name: Instalando o '{{ pacote }}'
+      package: 
+        name: '{{ pacote }}'
+        state: '{{ estado }}'
+        
+
+
+
+
+
+...

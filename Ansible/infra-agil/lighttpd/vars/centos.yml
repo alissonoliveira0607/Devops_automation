@@ -1,0 +1,8 @@
+---
+#Centos vars
+
+user: lighttpd
+group: lighttpd
+
+
+...

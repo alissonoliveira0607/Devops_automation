@@ -1,0 +1,21 @@
+---
+- name: Instala o memcached
+  become: yes
+  hosts: database
+  vars:
+    pacote: memcached
+    estado: present
+    servico: started
+  tasks:
+    - name: memcached install
+      package:
+        name: '{{ pacote }}'
+        state: '{{ estado }}'
+    - name: Starta e habilita o serviço '{{ pacote }}'
+      service:
+        name: '{{ pacote }}'
+        state: '{{ servico }}'
+        enabled: yes
+
+
+...

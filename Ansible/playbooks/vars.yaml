@@ -1,0 +1,6 @@
+---
+#variaveis composta por chave e valor
+pacote: vim
+estado: present
+
+...

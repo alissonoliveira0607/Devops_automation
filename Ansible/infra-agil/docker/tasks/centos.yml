@@ -1,0 +1,6 @@
+- name: Garantindo repositório
+  yum_repository:
+    name: docker-ce
+    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+    description: Docker CE Stable
+    file: docker-ce
