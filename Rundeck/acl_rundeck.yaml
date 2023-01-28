@@ -1,0 +1,34 @@
+description: ACL para visualização do projeto infra-agil
+context:
+  application: rundeck
+for:
+  project:
+  - equals:
+      name: infra-agil
+    allow: read
+  storage:
+  - equals:
+      name: rundeck
+    allow: read
+by:
+  group: viewer
+  
+---
+
+description: ACL para visualização do projeto infra-agil
+context:
+  project: infra-agil
+for:
+  resource:
+  - allow: [read,run]
+  adhoc:
+  - allow: [read,run]
+  job:
+  - allow: [read,run]
+  node:
+  - allow: [read,run]
+by:
+  group: viewer
+
+
+  
